@@ -1,5 +1,6 @@
 import pickle
 import os
+import pprint
 from datetime import datetime
 
 # ==============================
@@ -200,10 +201,8 @@ def add_investimentos(investimentos):
 # ==============================
 # SALDO FINAL
 # ==============================
-def saldo_final(entradas, despesas, investimentos):
-    totalE = totalD = totalI = 0.0
-    sair = ""
-
+def calc_total(entradas,despesas,investimentos):
+    totalE,totalI,totalD,final=0.00,0.00,0.00,0.00
     for categoria in entradas:
         for (_, _, valor) in entradas[categoria]:
             totalE += valor
@@ -217,12 +216,112 @@ def saldo_final(entradas, despesas, investimentos):
             totalI += valor
 
     final = totalE - totalD
+    
+    return totalE,totalI,totalD,final
+def saldo_final(entradas, despesas, investimentos):
+    sair = ""
 
+    totalE,totalI,totalD,final=calc_total(entradas,despesas,investimentos)
+    
     while sair != "1":
-        print("____________________________________________________________")
-        print(f"Saldo final: R${final:.2f} | Total investido: R${totalI:.2f}")
-        print("____________________________________________________________")
+        print("=" * 60)
+        print(f"{'RESUMO MENSAL':^60}")
+        print("=" * 60)
+
+        print(f"{'Entradas':<25}R${totalE:>12.2f}")
+        print(f"{'Despesas':<25}R${totalD:>12.2f}")
+        print(f"{'Investimentos':<25}R${totalI:>12.2f}")
+
+        print("-" * 60)
+        print(f"{'SALDO FINAL':<25}R${final:>12.2f}")
+        print("=" * 60)
+
         sair = input("1- Voltar")
+
+
+# ==============================
+# ANUAL
+# ==============================
+
+def fechamento(meses,entradas,despesas,investimentos,):
+    
+    totalE,totalI,totalD,final=calc_total(entradas,despesas,investimentos)
+    menu='''
+Selecione o mês para fazer o fechamento: 
+ ___________
+|___Meses___|
+|1-Janeiro  |
+|2-Fevereiro|
+|3-Março    |
+|4-Abril    |
+|5-Maio     |
+|6-Junho    |
+|7-Julho    |
+|8-Agosto   |
+|9-Setembro |
+|10-Outubro |
+|11-Novembro|
+|12-Dezembro|
+|___________|
+'''
+    opt=int(input(menu))
+    
+
+    #Entradas
+    meses[opt][1][0]=totalE
+    #saidas
+    meses[opt][1][1]=totalD
+    #investimentos
+    meses[opt][1][2]=totalI
+    #SaldoFinal
+    meses[opt][1][3]=final
+    
+    #Zerando os dicionarios
+    entradas.clear()
+    despesas.clear()
+    investimentos.clear()
+    
+def saida_anual(meses):
+    
+    os.system("cls")
+
+    print("=" * 95)
+    print(f"{'PLANEJAMENTO ANUAL':^95}")
+    print("=" * 95)
+
+    # Cabeçalho
+    print(f"{'Mês':<15}"
+          f"{'Entradas':>15}"
+          f"{'Saídas':>15}"
+          f"{'Investimentos':>18}"
+          f"{'Saldo Final':>15}")
+    print("-" * 95)
+
+    # Corpo da tabela
+    for i in range(1, 13):
+        nome_mes = meses[i][0]
+        entradas = meses[i][1][0]
+        saidas = meses[i][1][1]
+        investimentos = meses[i][1][2]
+        saldo = meses[i][1][3]
+
+        print(f"{nome_mes:<15}"
+              f"R${entradas:>13.2f}"
+              f"R${saidas:>13.2f}"
+              f"R${investimentos:>16.2f}"
+              f"R${saldo:>13.2f}")
+
+    print("=" * 95)
+
+   
+    
+def resumo_anual(meses):
+    
+    sair=''
+    while sair!="1":
+        saida_anual(meses)
+        sair=input("Digite 1 para sair:\n")   
+    
 
 
 # ==============================
@@ -244,6 +343,8 @@ Escolha uma Opção:
 |2-Despesas        |
 |3-Investimentos   |
 |4-Saldo Final     |
+|5-Fechar Mês      |
+|6-Resumo Anual    |
 |7-Sair            |
 |__________________|\n
 '''

@@ -109,4 +109,55 @@ def abrir_mes(mes,ano):
     finally:
         con.close
         
-iniciar_meses()
+
+
+def criar_categoria(nome,tipo):
+    con=get_connection()
+    cur=con.cursor()
+    
+    try:
+        cur.execute("INSERT INTO categoria (nome,tipo) VALUES (?,?)",(nome,tipo,))
+        con.commit()
+    except Exception as e:
+        print("Erro",e)
+    finally:
+        con.close()
+    
+    
+
+def listar_categorias():
+    
+    con=get_connection()
+    cur=con.cursor()
+    investimento=[]
+    saida=[]
+    entrada=[]
+    try:
+        cur.execute("""SELECT * FROM categoria  """)
+    
+        categorias=cur.fetchall()
+    
+        for categoria in categorias:
+            if categoria[2]=="entrada":
+                entrada.append(categoria[1])
+            elif categoria[2]=="saida":
+                entrada.append(categoria[1])
+            elif categoria[2]=="entrada":
+                entrada.append(categoria[1])
+                
+            
+        
+        con.commit()
+        con.close()
+        
+
+        
+    except Exception as e: 
+        print("Erro",e)
+    
+    
+    
+    
+tipos=["entrada","saida","investimento"]
+
+listar_categorias()

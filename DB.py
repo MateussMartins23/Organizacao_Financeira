@@ -1,6 +1,5 @@
 import sqlite3
 
-
 def get_connection():
     con=sqlite3.connect("./dados.db")
     con.row_factory=sqlite3.Row
@@ -124,40 +123,48 @@ def criar_categoria(nome,tipo):
         con.close()
     
     
-
+def imprimir_lista(lista,tipo):
+    
+    print(tipo)
+    for nome in lista:
+        print(f'\t-{nome}')
+    print("___________________________________")
+    
 def listar_categorias():
+    entradas=[]
+    saidas=[]
+    investimentos=[]
     
-    con=get_connection()
-    cur=con.cursor()
-    investimento=[]
-    saida=[]
-    entrada=[]
+    con = get_connection()
+    cur = con.cursor()
+    
+    categorias = []
+    
     try:
-        cur.execute("""SELECT * FROM categoria  """)
+        cur.execute("""
+        SELECT nome, tipo 
+        FROM categoria
+        """)
     
-        categorias=cur.fetchall()
-    
-        for categoria in categorias:
-            if categoria[2]=="entrada":
-                entrada.append(categoria[1])
-            elif categoria[2]=="saida":
-                entrada.append(categoria[1])
-            elif categoria[2]=="entrada":
-                entrada.append(categoria[1])
-                
+        rows = cur.fetchall()
+    #MELHORAR O MÉTODO DE IMPRESSÃO DPS
+        for row in rows:
+            if row['tipo']=='entrada':
+                entradas.append(row['nome'])
+            if row['tipo']=='investimento':
+                investimentos.append(row['nome'])
+            if row['tipo']=='saida':
+                saidas.append(row['nome'])
+        print("___________________________________")
+        imprimir_lista(entradas,"Entrada")
+        imprimir_lista(saidas,"Saida")
+        imprimir_lista(investimentos,"Investimento")
             
         
-        con.commit()
-        con.close()
-        
-
-        
     except Exception as e: 
-        print("Erro",e)
-    
-    
-    
-    
-tipos=["entrada","saida","investimento"]
-
+        print("Erro", e)
+        
+    finally:
+        con.close()
+print("começou")
 listar_categorias()
